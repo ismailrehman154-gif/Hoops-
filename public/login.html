@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hoops! - Log in</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Rubik+Spray+Paint&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="css/style.css" />
+</head>
+<body>
+<div class="login-wrap">
+  <div class="login-card">
+    <p class="logo">Hoops!</p>
+    <p class="login-tag">Find a run before you leave the house.</p>
+
+    <form id="login-form" novalidate>
+      <div class="field" id="name-field">
+        <label for="player-name">Player name</label>
+        <input type="text" id="player-name" placeholder="What should the courts call you?" autocomplete="nickname" />
+        <p class="error">Give us a name so we know who is who.</p>
+      </div>
+
+      <div class="field">
+        <label for="play-style">Play style</label>
+        <input type="text" id="play-style" placeholder="e.g. shooter, lockdown defender" />
+        <p class="hint">Optional. A line about your game.</p>
+      </div>
+
+      <div class="field">
+        <label>Your level</label>
+        <div class="segmented">
+          <label><input type="radio" name="level" value="Beginner" /><span>Beginner</span></label>
+          <label><input type="radio" name="level" value="Intermediate" checked /><span>Intermediate</span></label>
+          <label><input type="radio" name="level" value="Advanced" /><span>Advanced</span></label>
+        </div>
+      </div>
+
+      <button class="btn-primary" type="submit">Sign in</button>
+    </form>
+  </div>
+</div>
+<script src="js/common.js"></script>
+<script src="js/login.js"></script>
+</body>
+</html>

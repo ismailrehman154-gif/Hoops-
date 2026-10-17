@@ -1,0 +1,1 @@
+{"dependencies":{"express":"^4.21.2"},"description":"Hoops! Find a run before you leave the house. Anonymous park-traffic for NYC outdoor courts.","license":"MIT","main":"server.js","name":"hoops","scripts":{"dev":"node --watch server.js","start":"node server.js"},"version":"0.1.0"}
