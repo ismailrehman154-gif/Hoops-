@@ -336,3 +336,59 @@ body {
   color: var(--muted);
   line-height: 1.5;
 }
+
+/* ---------- Responsive: three breakpoints ---------- */
+/* Everything above is the mobile layout. It stays the base. */
+
+/* Tablet: 640px and up. Wider column, two cards per row. */
+@media (min-width: 640px) {
+  .app { max-width: 720px; }
+  .tabbar { max-width: 720px; }
+
+  #park-list,
+  #court-list {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0 12px;
+    padding: 0 16px;
+  }
+  #park-list .card,
+  #court-list .card { margin: 0 0 12px; }
+  #park-list .empty,
+  #court-list .empty { grid-column: 1 / -1; }
+
+  /* accent bars alternate orange / teal across the two columns */
+  #park-list .card:nth-of-type(3n+2) { border-left-color: var(--orange); }
+  #park-list .card:nth-of-type(3n) { border-left-color: var(--orange); }
+  #park-list .card:nth-of-type(even) { border-left-color: #0e9594; }
+
+  .login-card {
+    width: 100%;
+    max-width: 440px;
+    margin-left: auto;
+    margin-right: auto;
+  }
+}
+
+/* Desktop: 1024px and up. Full width, three cards per row. */
+@media (min-width: 1024px) {
+  .app { max-width: 1080px; }
+  .tabbar { max-width: 1080px; }
+
+  #park-list,
+  #court-list { grid-template-columns: 1fr 1fr 1fr; }
+
+  /* back to the three-color cycle: orange, teal, purple down the rows */
+  #park-list .card:nth-of-type(even) { border-left-color: var(--orange); }
+  #park-list .card:nth-of-type(3n+2) { border-left-color: #0e9594; }
+  #park-list .card:nth-of-type(3n) { border-left-color: #7b5ea7; }
+
+  .hero { padding: 150px 32px 30px; }
+  .section-title { font-size: 26px; }
+
+  /* single-column pages stay readable instead of stretching */
+  .profile-card { max-width: 720px; margin: 20px auto 12px; }
+  .setting-row { max-width: 720px; margin: 0 auto 10px; }
+  .btn-ghost { max-width: 720px; margin-left: auto; margin-right: auto; }
+  .about { max-width: 720px; margin: 20px auto; }
+}
