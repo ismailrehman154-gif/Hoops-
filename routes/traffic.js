@@ -1,24 +1,31 @@
-// Demo traffic for the frontend draft.
-// In-memory pings with the same fuzzy levels as the real backend:
-// 3+ pings warms a court up, 6+ is busy, 10+ is packed. 30-minute decay.
-// The Mongo version in hoops-mongo replaces this file when it is ready.
+// Traffic at GET /api/traffic, pings at POST /api/ping.
+// Demo version: pings live in memory, gone when the server restarts.
+// The Mongo version replaces this file when the real backend is ready.
 
 const express = require("express");
-const fs = require("fs");
-const path = require("path");
+const fs = require("fs"); // built into Node. reads files.
+const path = require("path"); // built into Node. builds folder paths.
 
 const router = express.Router();
 
+// Same courts.json as the parks route, so the ids always match.
 const courts = JSON.parse(
   fs.readFileSync(path.join(__dirname, "..", "courts.json"), "utf8")
 ).courts;
 
+// How long a ping counts: 30 minutes, in milliseconds.
 const PING_WINDOW_MS = 30 * 60 * 1000;
+
+// Quick check that a pinged court id is real.
 const knownCourts = new Set(courts.map((c) => c.courtId));
 
-// { courtId, ts }. Never stores who pinged, just that a ping happened.
+// Every ping: { courtId, ts }. Never stores who pinged,
+// just that somebody was at that court at that time.
 let pings = [];
 
+// Turns a ping count into a level word.
+// The frontend's badge turns the word into the Slow/Moderate/High label,
+// so this file picks the word and app.js picks how it looks.
 function levelFor(count) {
   if (count >= 10) return "packed";
   if (count >= 6) return "busy";
@@ -26,12 +33,16 @@ function levelFor(count) {
   return "quiet";
 }
 
+// Throws away pings older than the 30-minute window.
+// "Prune" just means trim: the cutoff is now minus 30 minutes,
+// filter keeps only the pings newer than that.
 function prune() {
   const cutoff = Date.now() - PING_WINDOW_MS;
   pings = pings.filter((p) => p.ts >= cutoff);
 }
 
-// A few demo pings so the draft does not open on an empty map.
+// A few fake pings so the page doesn't open empty while testing.
+// First court gets 7 (busy), next two get 4 and 3 (warming up).
 function seedDemo() {
   const now = Date.now();
   const ids = courts.slice(0, 3).map((c) => c.courtId);
@@ -41,7 +52,7 @@ function seedDemo() {
 }
 seedDemo();
 
-// A player at a court pings it. Body: { courtId }. That is all we accept.
+// A player at a court pings it. Body is just { courtId }. Nothing else accepted.
 router.post("/ping", (req, res) => {
   const { courtId } = req.body || {};
   if (!courtId || !knownCourts.has(courtId)) {
@@ -51,8 +62,8 @@ router.post("/ping", (req, res) => {
   res.json({ ok: true });
 });
 
-// The frontend calls this. The shape matches /api/courts/active on the
-// real backend, so the frontend does not change when the backends swap.
+// The home page calls this. Prunes old pings first, counts what's left
+// per court, sends every court with its level word.
 router.get("/traffic", (req, res) => {
   prune();
   const counts = {};

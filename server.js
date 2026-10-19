@@ -1,19 +1,18 @@
-// Hoops! frontend 
-// Serves the pages in public/ and wires the API routes the frontend calls.
-
-// come later, on top of the Mongo backend in hoops-mongo.
+// Hoops! server. Serves the pages in public/ and the /api routes.
+// Run it with: npm install, then npm run dev. Opens on http://localhost:3000.
 
 const express = require("express");
-const path = require("path");
+const path = require("path"); // built into Node, no install needed. builds folder paths.
 
 const app = express();
-app.use(express.json());
-app.use(express.static(path.join(__dirname, "public")));
+app.use(express.json()); // lets routes read JSON bodies, like the ping's { courtId }
+app.use(express.static(path.join(__dirname, "public"))); // serves index.html, css, js, images
 
-app.use("/api", require("./routes/auth"));
+// The API. Auth comes later, so only parks and traffic for now.
 app.use("/api", require("./routes/parks"));
 app.use("/api", require("./routes/traffic"));
 
+// Quick check the server is alive.
 app.get("/api/health", (req, res) => res.json({ ok: true }));
 
 const PORT = process.env.PORT || 3000;

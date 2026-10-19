@@ -140,6 +140,7 @@ body {
 .go:active { background: #000; }
 
 .ping-row { display: flex; gap: 8px; margin-top: 12px; }
+.ping-row .go { margin-top: 0; flex: 1; }
 .ping-btn {
   flex: 1;
   padding: 11px;
@@ -180,7 +181,17 @@ body {
   font-weight: 600;
   padding: 4px 0;
 }
-.tabbar a svg { width: 24px; height: 24px; }
+/* Tab icons: SVG is just icons drawn with code instead of image files.
+   The drawing lives in the HTML (viewBox + path), all the styling lives here. */
+.tabbar a svg {
+  width: 24px;
+  height: 24px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
 .tabbar a.active { color: var(--orange); }
 
 /* Login */

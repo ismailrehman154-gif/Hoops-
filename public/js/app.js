@@ -1,42 +1,37 @@
-// Home page: park list with live traffic.
-// Calls /api/traffic when the backend is up. When it is not (opening the
-// page without the server, or the route missing), falls back to the bundled
-// courts below with demo levels, so the page still reads like the app.
+// Home page: the park list with live traffic.
+// Tries the server first. Server down? Reads the bundled courts file.
+// That missing too? Uses the 8 backup courts in common.js.
+// Either way the page still looks like the app.
 
 const API = {
   traffic: "/api/traffic",
 };
 
-// Same shape as courts.json. Only used when the API is unreachable.
-const FALLBACK_COURTS = [
-  { courtId: "flushing-meadows", name: "Flushing Meadows Corona Park", neighborhood: "Corona, Queens", lat: 40.74612, lng: -73.85279 },
-  { courtId: "cunningham-park", name: "Cunningham Park", neighborhood: "Fresh Meadows, Queens", lat: 40.74238, lng: -73.76479 },
-  { courtId: "astoria-park", name: "Astoria Park", neighborhood: "Astoria, Queens", lat: 40.77675, lng: -73.92371 },
-  { courtId: "forest-park", name: "Forest Park", neighborhood: "Woodhaven, Queens", lat: 40.69631, lng: -73.86651 },
-  { courtId: "kissena-park", name: "Kissena Park", neighborhood: "Flushing, Queens", lat: 40.75178, lng: -73.82036 },
-  { courtId: "rath-park", name: "Rath Park", neighborhood: "Franklin Square, NY", lat: 40.70797, lng: -73.68062 },
-  { courtId: "tompkins-square", name: "Tompkins Square Park", neighborhood: "East Village, Manhattan", lat: 40.7265, lng: -73.98178 },
-  { courtId: "west-4th", name: "West 4th Street Courts", neighborhood: "Greenwich Village, Manhattan", lat: 40.7312, lng: -74.0003 },
-];
-
-// Backend levels to the badges the cards show.
+// Turns the backend's level word into what the card shows.
+// The word is different for every court and changes over time,
+// so it has to live in JS. HTML can't know it ahead of time.
 const BADGE = {
-  quiet: { label: "Slow", cls: "slow" },  // using these to display the activity at the parks, currently the data is 
-  "warming up": { label: "Moderate", cls: "moderate" }, // misconstrued becaused there are no real users using the 
-  busy: { label: "High", cls: "high" }, //application so it would not accurately output the responses
+  quiet: { label: "Slow", cls: "slow" },
+  "warming up": { label: "Moderate", cls: "moderate" },
+  busy: { label: "High", cls: "high" },
   packed: { label: "High", cls: "high" },
 };
 
 let courts = [];
 let userPos = null;
 
-// Stable demo level per court so the fallback does not shuffle on reload.
+// Picks a steady demo level for a backup court.
+// Hashes the court id into a number, uses it to pick from the list,
+// so a court shows the same level on every reload instead of shuffling.
 function demoLevel(courtId) {
   let h = 0;
   for (const ch of courtId) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
   return ["quiet", "quiet", "warming up", "busy", "packed"][h % 5];
 }
 
+// Gets the courts with their traffic levels.
+// Plan: 1. ask the server. 2. if that fails, read the bundled courts file
+// and hand each court a demo level. 3. if that fails too, use the backups.
 async function loadTraffic() {
   try {
     const res = await fetch(API.traffic);
@@ -55,6 +50,8 @@ async function loadTraffic() {
   }
 }
 
+// Asks the phone where it is, but only when the settings toggle is on.
+// When the location lands, redraws the list so the distances show up.
 function askLocation() {
   const settings = loadSettings();
   if (!settings.location || !("geolocation" in navigator)) return;
@@ -64,16 +61,17 @@ function askLocation() {
       render();
     },
     () => {
-      // Permission denied or unavailable. Distances just say "near you".
+      // Said no, or the phone can't. Distances just say "near you".
     },
     { timeout: 8000, maximumAge: 600000 }
   );
 }
 
-// Miles between two lat/lng points.
+// Miles between two lat/lng points. Standard map math (haversine):
+// turns the points into radians, runs the formula, times earth's radius.
 function milesBetween(a, b) {
   const rad = (d) => (d * Math.PI) / 180;
-  const R = 3958.8;
+  const R = 3958.8; // earth radius in miles
   const dLat = rad(b.lat - a.lat);
   const dLng = rad(b.lng - a.lng);
   const s =
@@ -82,16 +80,15 @@ function milesBetween(a, b) {
   return 2 * R * Math.asin(Math.sqrt(s));
 }
 
+// What the card shows under the park name: "1.2 mi", "here", or "near you".
 function distanceLabel(court) {
   if (!userPos) return "near you";
   const mi = milesBetween(userPos, court);
   return mi < 0.1 ? "here" : mi.toFixed(1) + " mi";
 }
 
-function mapsUrl(court) {
-  return `https://www.google.com/maps/dir/?api=1&destination=${court.lat},${court.lng}`;
-}
-
+// Builds one park card's HTML from a court object.
+// Called once per court, so every card gets its own name, badge, and link.
 function cardHtml(court) {
   const badge = BADGE[court.level] || BADGE.quiet;
   const place = court.location || court.neighborhood || "";
@@ -108,6 +105,8 @@ function cardHtml(court) {
     </article>`;
 }
 
+// Draws the list. Filters by the search box, builds a card per match,
+// drops them all into #park-list at once.
 function render() {
   const q = document.getElementById("search").value.trim().toLowerCase();
   const list = document.getElementById("park-list");
@@ -122,6 +121,7 @@ function render() {
     : `<p class="empty">No parks match "${escapeHtml(q)}". Try another search.</p>`;
 }
 
+// "Welcome back, {name}" when signed in, else points to the login page.
 function greet() {
   const profile = loadProfile();
   const el = document.getElementById("welcome");
@@ -130,6 +130,8 @@ function greet() {
     : `Welcome to Hoops! <a href="login.html">Set up your profile</a>`;
 }
 
+// Page loaded: greet, get the courts, draw them, ask for location,
+// redraw the list on every keystroke in the search box.
 document.addEventListener("DOMContentLoaded", async () => {
   greet();
   courts = await loadTraffic();
