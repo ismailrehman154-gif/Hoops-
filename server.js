@@ -1,6 +1,6 @@
-// Hoops! frontend scaffold.
+// Hoops! frontend 
 // Serves the pages in public/ and wires the API routes the frontend calls.
-// The route files stay thin on purpose: real auth and real traffic storage
+
 // come later, on top of the Mongo backend in hoops-mongo.
 
 const express = require("express");

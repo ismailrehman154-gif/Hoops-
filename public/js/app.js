@@ -21,9 +21,9 @@ const FALLBACK_COURTS = [
 
 // Backend levels to the badges the cards show.
 const BADGE = {
-  quiet: { label: "Slow", cls: "slow" },
-  "warming up": { label: "Moderate", cls: "moderate" },
-  busy: { label: "High", cls: "high" },
+  quiet: { label: "Slow", cls: "slow" },  // using these to display the activity at the parks, currently the data is 
+  "warming up": { label: "Moderate", cls: "moderate" }, // misconstrued becaused there are no real users using the 
+  busy: { label: "High", cls: "high" }, //application so it would not accurately output the responses
   packed: { label: "High", cls: "high" },
 };
 
