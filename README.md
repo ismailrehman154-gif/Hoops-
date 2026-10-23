@@ -1,5 +1,7 @@
 # Hoops!
 
+**Live site:** https://hoops-ismail.onrender.com
+
 Find a run before you leave the house. Hoops! shows anonymous park
 traffic for NYC outdoor courts, so players can pick where to play
 instead of showing up to an empty court or a packed one.
@@ -33,7 +35,7 @@ public/
   index.html       Home: search, park cards, traffic badges, Go Now
   courts.html      Full directory + "I am at this court" ping
   profile.html     Saved profile from localStorage
-  settings.html    Location toggle, clear data
+  settings.html     Location toggle, clear data
   css/style.css    Basketball theme, mobile-first
   js/              Vanilla JS, one file per page + common.js
 ```
