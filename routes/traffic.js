@@ -1,6 +1,6 @@
 // Traffic at GET /api/traffic, pings at POST /api/ping.
 // Demo version: pings live in memory, gone when the server restarts.
-// The Mongo version replaces this file when the real backend is ready.
+// plan on using mongodb to replace the in server saves
 
 const express = require("express");
 const fs = require("fs"); // built into Node. reads files.

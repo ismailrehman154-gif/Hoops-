@@ -16,4 +16,4 @@ app.use("/api", require("./routes/traffic"));
 app.get("/api/health", (req, res) => res.json({ ok: true }));
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => console.log(`Hoops! listening on :${PORT}`));
+app.listen(PORT, () => console.log(`Hoops! listening on :${PORT}`)); // listening on :3000, or the port Heroku gives us.
